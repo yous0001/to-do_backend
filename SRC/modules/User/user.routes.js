@@ -6,6 +6,7 @@ import { multerMiddlewareLocal,multerMiddlewareHost } from "../../middlewares/mu
 import { allowedExtensions } from "../../utils/allowedExtenstions.js";
 import expressAsyncHandler from "express-async-handler";
 import { auth } from './../../middlewares/auth.middleware.js';
+import { systemRoles } from "../../utils/systemRoles.js";
 const router = Router();
 router.post('/signup',validationMiddleware(userSchema.signupSchema),expressAsyncHandler(userController.signup))
 router.get('/verify/:token',userController.verifyEmail)
@@ -14,4 +15,5 @@ router.post("/upload-img",auth(),
     multerMiddlewareHost({allowedExtensions:allowedExtensions.image}).single('profileImg'),expressAsyncHandler(userController.uploadImg)
 )
 router.delete('/delete-img',auth(),expressAsyncHandler(userController.deleteImg))
+router.delete('/delete-all',auth([systemRoles.superAdmin]),expressAsyncHandler(userController.deleteAllImgs))
 export default router

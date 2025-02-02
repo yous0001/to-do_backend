@@ -142,8 +142,11 @@ export const deleteImg = async  (req, res, next)=> {
 export const deleteImgs = async  (req, res, next)=> {
     const {ids}=body.query
     const data=await cloudinaryConfig().api.delete_resources(ids)//delete bulk image with public id 
-    if(data.result!='ok')
-        return res.status(400).json({message:"error", error:data.result})
-    const updatedUser=await userModel.findByIdAndUpdate(user._id,{profileImage:{secure_url:null,public_id:null}}, {new: true})
-    res.json({message:"success",user:updatedUser});
+    res.json({message:"success",data});
+}
+
+export const deleteAllImgs = async  (req, res, next)=> {
+    const data=await cloudinaryConfig().api.delete_resources_by_prefix('test')
+    const folderDeleted=await cloudinaryConfig().api.delete_folder('test')
+    res.status(200).json({message:"success",data,folderDeleted});
 }
