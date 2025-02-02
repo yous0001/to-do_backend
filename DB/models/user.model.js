@@ -38,6 +38,10 @@ const userSchema=new Schema({
         type:String,
         enum:Object.values(systemRoles),
         default:'user'
+    },
+    profileImage:{
+        secure_url:{type:String}
+        ,public_id:{type:String,unique:true}
     }
 },{
     timestamps:true

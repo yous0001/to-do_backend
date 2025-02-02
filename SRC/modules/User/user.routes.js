@@ -4,11 +4,13 @@ import * as userSchema from "./user.schema.js"
 import { validationMiddleware } from "../../middlewares/validation.middleware.js";
 import { multerMiddlewareLocal,multerMiddlewareHost } from "../../middlewares/multer.middleware.js";
 import { allowedExtensions } from "../../utils/allowedExtenstions.js";
-import { uploadFile } from "../Note/note.controller.js";
-
+import expressAsyncHandler from "express-async-handler";
+import { auth } from './../../middlewares/auth.middleware.js';
 const router = Router();
-router.post('/signup',multerMiddlewareHost({allowedExtensions:allowedExtensions.image}).single("profileImg"),validationMiddleware(userSchema.signupSchema),userController.signup)
+router.post('/signup',validationMiddleware(userSchema.signupSchema),expressAsyncHandler(userController.signup))
 router.get('/verify/:token',userController.verifyEmail)
-router.post('/signin',validationMiddleware(userSchema.signinSchema),userController.signin)
-
+router.post('/signin',validationMiddleware(userSchema.signinSchema),expressAsyncHandler(userController.signin))
+router.post("/upload-img",auth(),
+    multerMiddlewareHost({allowedExtensions:allowedExtensions.image}).single('profileImg'),expressAsyncHandler(userController.uploadImg)
+)
 export default router

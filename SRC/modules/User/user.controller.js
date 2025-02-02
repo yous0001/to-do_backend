@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs"
 import { sendEmailService } from './../Services/sendEmail.js';
 import jwt from "jsonwebtoken";
 import { verificationEmailTemplate } from "../Services/emailTemplates.js";
+import { cloudinaryConfig } from './../../utils/cloudinary.utils.js';
 
 export const signup=async(req,res,next)=>{
     const {email,password,name,gender,intrests,age}=req.body;
@@ -38,7 +39,7 @@ export const signup=async(req,res,next)=>{
 
         await user.save()
         user.password="hidden"
-        res.status(201).json({message:"User created successfully",user,profileImg:req.file})
+        res.status(201).json({message:"User created successfully",user})
     } catch (error) {
         return res.status(500).json({message:"error", error:error.message})
     }
@@ -115,3 +116,16 @@ export const logout=async(req,res,next)=>{
         return res.status(500).json({message:"error", error:error.message})
     }
 }
+
+export const uploadImg = async  (req, res, next)=> {
+    const {_id}=req.authuser
+    const data=await cloudinaryConfig().uploader.upload(req.file.path,
+        {
+            folder:"test",  
+            resource_type:"image",  
+            use_filename:true, 
+            tags:["cloud","image","internal"]
+        })
+        const user=await userModel.findByIdAndUpdate(_id,{profileImage:{secure_url:data.secure_url,public_id:data.public_id}}, {new: true})
+        res.json({message:"success",user});
+};
