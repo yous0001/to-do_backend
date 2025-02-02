@@ -129,3 +129,21 @@ export const uploadImg = async  (req, res, next)=> {
         const user=await userModel.findByIdAndUpdate(_id,{profileImage:{secure_url:data.secure_url,public_id:data.public_id}}, {new: true})
         res.json({message:"success",user});
 };
+
+export const deleteImg = async  (req, res, next)=> {
+    const user=req.authuser //get user from auth module
+    const data=await cloudinaryConfig().uploader.destroy(user.profileImage.public_id)//delete image with public id that stored in user collection
+    if(data.result!='ok')//check if image deleted
+        return res.status(400).json({message:"error", error:data.result})
+    const updatedUser=await userModel.findByIdAndUpdate(user._id,{profileImage:{secure_url:null,public_id:null}}, {new: true})
+    res.json({message:"success",user:updatedUser});
+}
+
+export const deleteImgs = async  (req, res, next)=> {
+    const {ids}=body.query
+    const data=await cloudinaryConfig().api.delete_resources(ids)//delete bulk image with public id 
+    if(data.result!='ok')
+        return res.status(400).json({message:"error", error:data.result})
+    const updatedUser=await userModel.findByIdAndUpdate(user._id,{profileImage:{secure_url:null,public_id:null}}, {new: true})
+    res.json({message:"success",user:updatedUser});
+}

@@ -13,4 +13,5 @@ router.post('/signin',validationMiddleware(userSchema.signinSchema),expressAsync
 router.post("/upload-img",auth(),
     multerMiddlewareHost({allowedExtensions:allowedExtensions.image}).single('profileImg'),expressAsyncHandler(userController.uploadImg)
 )
+router.delete('/delete-img',auth(),expressAsyncHandler(userController.deleteImg))
 export default router
