@@ -7,6 +7,10 @@ const NoteSchema=new mongoose.Schema({
         required:true
     },
     desc:String,
+    completed:{
+        type:Boolean,
+        default:false
+    },
     addedBy:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',

@@ -14,26 +14,23 @@ export const addNote=async(req, res, next)=>{
 }
 
 export const getNotes=async(req, res, next)=>{
-    try{
-        const {id}=req.authuser
-        const notes=await noteModel.find({addedBy:id}).populate({path:'addedBy',select:'name email -_id'});
-        res.status(200).json({success:true,message:"notes fetched successfully",notes});
-    }catch(err){
-        console.log(err);
-        res.status(500).json({success:false,message:"server error"});
-    }
+
+    const {id}=req.authuser
+    const notes=await noteModel.find({addedBy:id}).populate({path:'addedBy',select:'name email _id'});
+    res.status(200).json({success:true,message:"notes fetched successfully",notes});
+
+
 }
 
 export const updateNote=async(req, res, next)=>{
     try{
-        const {token}=req.headers;
+        const user=req.authuser;
         const {id}=req.params;
         const {title,desc}=req.body;
-        
-        const user=jwt.verify(token, process.env.JWT_SECRET);
+
 
         const updatedNote=await noteModel.findOneAndUpdate(
-            {_id:id,addedBy:user.id},
+            {_id:id,addedBy:user._id},
             {title,desc},
             {new:true}
         );
@@ -47,6 +44,15 @@ export const updateNote=async(req, res, next)=>{
         res.status(500).json({success:false,message:"server error"});
     }
 }
-export const uploadFile=async(req, res, next)=>{
-    res.status(200).json({success:true,message:"file uploaded successfully",file:req.file});
+
+export const completeNote=async(req, res, next)=>{
+    const {_id}=req.authuser;
+    const {id}=req.params;
+
+    const updatedNote=await noteModel.findOneAndUpdate({_id:id,addedBy:_id},{completed:true},{new:true});
+
+    if(!updatedNote) 
+        return next(new Error("note not found",{cause:404}));
+
+    res.status(200).json({success:true,message:"note completed successfully",updatedNote});
 }
